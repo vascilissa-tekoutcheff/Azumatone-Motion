@@ -3,14 +3,15 @@
 Azumatone Motion is a collection of Max objects for shaping motion and
 expressive transitions.
 
-## Installation
+## Installation and compatibility
 
 Place the `Azumatone Motion` folder in your Max Packages folder, then restart
 Max. On macOS with Max 9, the folder is normally
 `~/Documents/Max 9/Packages/`.
 
-The included `.mxo` externals are universal macOS builds for Intel and Apple
-Silicon.
+Azumatone Motion requires Max 9 or later on macOS. The included `.mxo`
+externals are universal builds for Intel and Apple Silicon; the Intel half has
+not been tested natively. No Windows build is provided.
 
 ## Objects
 
@@ -30,18 +31,30 @@ speakers.
 The `mc.` objects are native multichannel externals. Use `mc.dup~` to send
 the same mono signal to several channels.
 
-For `azu.fluence~` and `mc.azu.fluence~`, voice profiles are pseudo-randomly
-reassigned when the input reverses direction or starts moving after at least
-10 ms at a constant value. In bounded mode, a direction change must exceed
-one millionth of the range span. The profile favoring the gesture's direction
-is assigned to a different channel on consecutive gestures (when there are
-multiple channels). Positions and velocities are preserved, so existing momentum may
-still make another channel visibly lead. The detector follows the input
-signal itself, including values outside a bounded range.
+`azu.fluence~` and `mc.azu.fluence~` drive several coupled elastic voices from
+one mono target signal. The first argument sets the number of voices
+(default 4). Attributes:
 
-For message objects, Ease functions and Gen~ usage, see
+| Attribute | Default | Effect |
+|---|---|---|
+| `inertia` | `150` | Response time of the voices, in ms |
+| `damping` | `0.35` | Damping of the voices' response |
+| `cohesion` | `0.35` | Draws the voices together |
+| `dispersion` | `0.5` | Spreads the voices apart during transitions |
+| `mode` | `free` | `bounded` keeps the voices inside `range`; `free` may overshoot. Set at creation only |
+| `range` | `0 1` | Bounds used by `mode bounded`; changes are smoothed over 10 ms |
+
+Each voice has its own pseudo-random response profile. Profiles are reassigned
+when the input reverses direction or starts moving after at least 10 ms at a
+constant value, so with several voices the one favored by the gesture's
+direction changes from one gesture to the next. Positions and velocities are
+preserved, so existing momentum may still make another voice visibly lead.
+
+For message objects, the 19 Ease functions and Gen~ usage, see
 [message-objects.md](docs/message-objects.md). The package also includes the
-`azu.ease.gendsp` Gen~ patch and its supporting `AzumatoneEaseFunctions.genexpr`.
+`azu.ease.gendsp` Gen~ patch with its supporting `AzumatoneEaseFunctions.genexpr`,
+and `functions viewer.maxpat` (in `patchers/`), a plot of every Ease function
+with live settings.
 
 ## License
 
