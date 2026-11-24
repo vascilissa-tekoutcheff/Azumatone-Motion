@@ -17,12 +17,12 @@ not been tested natively. No Windows build is provided.
 
 | Object | Use |
 |---|---|
-| `azu.ease~` | Shape a normalized signal with an easing curve. |
-| `mc.azu.ease~` | Shape a multichannel signal with easing curves. |
-| `azu.ease` | Apply an easing curve to numbers or lists without DSP. |
-| `azu.fluence~` | Create several elastic trajectories from one target signal. |
-| `mc.azu.fluence~` | Create elastic trajectories in a multichannel signal. |
-| `azu.morph` | Transition between values or lists of values. |
+| `azu.ease~` | Map a progress signal through 19 expressive curves, with Character, headroom and reproducible drift. |
+| `mc.azu.ease~` | Apply the Ease curves per channel, with independently varied drift across an MC signal. |
+| `azu.ease` | Evaluate the same curves on individual numbers or lists at message rate. |
+| `azu.fluence~` | Turn one target signal into coupled elastic trajectories with inertia, damping, cohesion and dispersion. |
+| `mc.azu.fluence~` | Deliver the same coupled ensemble as one multichannel signal. |
+| `azu.morph` | Interpolate complete numeric states along an Ease curve, with continuous retargeting and externally driven or timed progression. |
 
 For message objects, the 19 Ease functions and Gen~ usage, see
 [message-objects.md](docs/message-objects.md). The package also includes the
