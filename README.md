@@ -24,13 +24,6 @@ not been tested natively. No Windows build is provided.
 | `mc.azu.fluence~` | Create elastic trajectories in a multichannel signal. |
 | `azu.morph` | Transition between values or lists of values. |
 
-Open an object's help patch in Max for an interactive example. Signal-object
-examples require DSP to be enabled; the help examples do not send sound to the
-speakers.
-
-The `mc.` objects are native multichannel externals. Use `mc.dup~` to send
-the same mono signal to several channels.
-
 For message objects, the 19 Ease functions and Gen~ usage, see
 [message-objects.md](docs/message-objects.md). The package also includes the
 `azu.ease.gendsp` Gen~ patch with its supporting `AzumatoneEaseFunctions.genexpr`,
