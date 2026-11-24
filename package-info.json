@@ -1,0 +1,34 @@
+{
+	"name" : "Azumatone Motion",
+	"displayname" : "Azumatone Motion",
+	"version" : "0.1.0",
+	"author" : "Timothée Rémi-Tekoutcheff",
+	"authors" : [  ],
+	"description" : "A collection of Max objects for shaping expressive motion and transitions, from message and state interpolation to audio-rate easing and coupled multichannel trajectories.",
+	"tags" : [ "motion", "easing", "interpolation", "transitions", "multichannel", "gen", "gesture", "mapping" ],
+	"website" : "https://www.azumatone.com",
+	"extends" : "",
+	"extensible" : 0,
+	"max_version_min" : "9.0",
+	"max_version_max" : "none",
+	"os" : 	{
+		"macintosh" : 		{
+			"min_version" : "none",
+			"platform" : [ "x64", "aarch64" ]
+		}
+
+	}
+,
+	"homepatcher" : "package presentation.maxpat",
+	"package_extra" : 	{
+		"reverse_domain" : "com.azumatone.motion",
+		"copyright" : "Copyright (c) 2026 Timothée Rémi-Tekoutcheff"
+	}
+,
+	"filelist" : 	{
+		"externals" : [ "azu.ease.mxo", "azu.ease~.mxo", "azu.fluence~.mxo", "azu.morph.mxo", "mc.azu.ease~.mxo", "mc.azu.fluence~.mxo" ],
+		"patchers" : [ "AzumatoneEaseFunctions.genexpr", "azu.ease.gendsp", "functions viewer.maxpat", "package presentation.maxpat" ],
+		"help" : [ "azu.ease.maxhelp", "azu.ease~.maxhelp", "azu.fluence~.maxhelp", "azu.morph-timed.maxpat", "azu.morph.maxhelp", "mc.azu.ease~.maxhelp", "mc.azu.fluence~.maxhelp" ],
+		"docs" : [ "message-objects.md" ]
+	}
+}

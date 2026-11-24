@@ -1,0 +1,616 @@
+// Azumatone curves. Mode and output limiting are applied by azuEaseEvaluate.
+azuEaseSmoothstep(x) {
+    return x * x * (3 - 2 * x);
+}
+
+azuEaseAnchor(x, p, p0, p1) {
+    return p - p0 - x * (p1 - p0);
+}
+
+azuEaseBoundCharacter(amount) {
+    // Avoid a large integral literal: Gen can infer it as a 32-bit integer.
+    scaledValue = amount * 1e-100;
+    return abs(scaledValue) > 1 ? amount / abs(scaledValue) : amount;
+}
+
+azuEaseParabolicWave(theta) {
+    phaseValue = theta / (2 * pi);
+    distanceValue = phaseValue - floor(phaseValue + 0.5);
+    return 1 - 8 * distanceValue * distanceValue;
+}
+
+azuEaseGompertz(x, amount, variation) {
+    k = 6 * (1 + 0.4 * variation);
+    centerValue = 0.35 + 0.12 * variation;
+    g0 = 0.0002841040787212936;
+    g1 = 0.9799615807073832;
+    if (variation != 0) {
+        g0 = exp(-exp(k * centerValue));
+        g1 = exp(-exp(-k * (1 - centerValue)));
+    }
+    g = exp(-exp(-k * (x - centerValue)));
+    nativeValue = (g - g0) / (g1 - g0);
+    return x + amount * (nativeValue - x);
+}
+
+azuEaseViscous(x, amount, variation) {
+    thresholdValue = 0.08 * (1 + 0.65 * variation);
+    k = 4 * (1 + 0.5 * variation);
+    denominatorValue = 0.9816843611112658;
+    if (variation != 0) {
+        denominatorValue = 1 - exp(-k);
+    }
+    nativeValue = 0;
+    if (x < thresholdValue) {
+        nativeValue = 0.05 * azuEaseSmoothstep(x / thresholdValue);
+    } else {
+        u = (x - thresholdValue) / (1 - thresholdValue);
+        nativeValue = 0.05 + 0.95 * (1 - exp(-k * u)) / denominatorValue;
+    }
+    return x + amount * (nativeValue - x);
+}
+
+azuEaseSpringSoft(x, amount, variation) {
+    amount = azuEaseBoundCharacter(amount);
+    dampingNative = 5 * (1 + 0.45 * variation);
+    frequencyNative = 3 * pi * (1 + 0.22 * variation);
+    amplitudeValue = 0.4 * (1 + 0.25 * variation);
+    excessValue = max(amount - 1, 0);
+    timeStretch = 1 + 0.5 * excessValue;
+    dampingValue = dampingNative / timeStretch;
+    frequencyValue = frequencyNative / timeStretch;
+    p1 = amplitudeValue * exp(-dampingValue) * cos(frequencyValue);
+    p = amplitudeValue * exp(-dampingValue * x) * cos(frequencyValue * x);
+    return x + amount * azuEaseAnchor(x, p, amplitudeValue, p1);
+}
+
+azuEaseSpringTight(x, amount, variation) {
+    amount = azuEaseBoundCharacter(amount);
+    dampingNative = 1.2 * (1 + 0.45 * variation);
+    frequencyNative = 11 * pi * (1 + 0.22 * variation);
+    amplitudeValue = 0.22 * (1 + 0.25 * variation);
+    excessValue = max(amount - 1, 0);
+    buzzValue = 1 + 0.6 * excessValue;
+    frequencyValue = frequencyNative * buzzValue;
+    dampingValue = dampingNative / (1 + 0.25 * excessValue);
+    p1 = amplitudeValue * exp(-dampingValue) * cos(frequencyValue);
+    p = amplitudeValue * exp(-dampingValue * x) * cos(frequencyValue * x);
+    return x + amount * azuEaseAnchor(x, p, amplitudeValue, p1);
+}
+
+azuEaseBounceGravity(x, amount, variation) {
+    characterValue = max(0, amount);
+    restitutionValue = (0.85 + 0.09 * variation) *
+        (characterValue / (characterValue + 3 / 14));
+    restTime = 0.96 + 0.03 * variation;
+    fallTime = restTime * (1 - restitutionValue) / (1 + restitutionValue);
+    nativeValue = 1;
+    if (x < fallTime) {
+        u = x / fallTime;
+        nativeValue = u * u;
+    } else if (restitutionValue > 0 && x < restTime) {
+        remainingValue = (restTime - x) / (restTime - fallTime);
+        bounceIndex = floor(log(remainingValue) / log(restitutionValue));
+        scaleValue = pow(restitutionValue, bounceIndex);
+        startValue = restTime - (restTime - fallTime) * scaleValue;
+        radiusValue = restitutionValue * scaleValue;
+        durationValue = 2 * fallTime * radiusValue;
+        u = max(0, min(1, (x - startValue) / durationValue));
+        nativeValue = 1 - 4 * radiusValue * radiusValue * u * (1 - u);
+    }
+    return nativeValue;
+}
+
+azuEaseBounceViscoelastic(x, amount, variation) {
+    characterValue = max(0, amount);
+    softnessValue = characterValue / (1 + characterValue);
+    contactTime = (0.18 + 1.80 * softnessValue * softnessValue) * (1 + 0.18 * variation);
+    restitutionValue = 0.42 + 0.50 * softnessValue + 0.05 * variation;
+    riseValue = 0.12 + 0.04 * softnessValue;
+    recoveryValue = 0.36 + 0.48 * softnessValue + 0.025 * variation;
+    depthValue = (0.10 + 0.16 * softnessValue) * (1 + 0.05 * variation);
+    restTime = 0.88 + 0.03 * variation;
+    totalTime = 1 + 5.2981621875 * contactTime +
+        2 * restitutionValue * (1 - pow(restitutionValue, 5)) / (1 - restitutionValue);
+    releaseStart = (totalTime - 0.75 * 0.7737809375 * contactTime) * restTime / totalTime;
+    releaseValue = azuEaseSmoothstep(max(0, min(1, (x - releaseStart) / (1 - releaseStart))));
+    timeValue = x * totalTime / restTime;
+    value = 1;
+    if (timeValue < 1) {
+        value = timeValue * timeValue;
+    } else {
+        timeValue -= 1;
+        speedValue = 2;
+        durationValue = contactTime;
+        for (contactIndex = 0; contactIndex < 6; contactIndex += 1) {
+            if (timeValue >= 0 && timeValue < durationValue) {
+                u = timeValue / durationValue;
+                compressionValue = 0;
+                if (contactIndex == 5) {
+                    compressionValue = u * (1 - u) * (1 - u) * (1 - u);
+                } else if (u < riseValue) {
+                    v = u / riseValue;
+                    compressionValue = depthValue * azuEaseSmoothstep(v) +
+                        riseValue * v * (1 - v) * (1 - v);
+                } else if (u < recoveryValue) {
+                    v = (u - riseValue) / (recoveryValue - riseValue);
+                    compressionValue = depthValue * (1 + 0.12 * azuEaseSmoothstep(v));
+                } else {
+                    v = (u - recoveryValue) / (1 - recoveryValue);
+                    compressionValue = depthValue * 1.12 * (1 - azuEaseSmoothstep(v)) +
+                        restitutionValue * (1 - recoveryValue) * v * v * (1 - v);
+                }
+                value = 1 + speedValue * durationValue * compressionValue;
+            }
+            timeValue -= durationValue;
+            if (contactIndex < 5) {
+                speedValue *= restitutionValue;
+                if (timeValue >= 0 && timeValue < speedValue) {
+                    value = 1 - speedValue * timeValue + timeValue * timeValue;
+                }
+                timeValue -= speedValue;
+            }
+            durationValue *= 0.95;
+        }
+    }
+    mappedValue = value <= 1 ? 0.68 * value :
+        0.68 + 0.28 * tanh(0.68 * (value - 1) / 0.28);
+    if (x >= restTime) {
+        mappedValue = 0.68;
+    }
+    return mappedValue + (1 - mappedValue) * releaseValue;
+}
+
+azuEaseRecoil(x, amount, variation) {
+    amount = azuEaseBoundCharacter(amount);
+    chargeValue = 0.35 + 0.08 * variation;
+    pullValue = 0.18 * (1 + 0.4 * variation);
+    approachRate = 5 * (1 + 0.5 * variation);
+    dampingValue = 3 * (1 - 0.35 * variation);
+    frequencyValue = 5 * pi * (1 + 0.2 * variation);
+    amplitudeValue = 0.22 * (1 - 0.25 * variation);
+    approachEnd = 0.9932620530009145;
+    if (variation != 0) {
+        approachEnd = 1 - exp(-approachRate);
+    }
+    pullExponent = 1.6;
+    ringExponent = 0.6;
+    signValue = amount >= 0 ? 1 : -1;
+    pullCoeff = signValue * pow(abs(amount), pullExponent);
+    ringCoeff = signValue * pow(abs(amount), ringExponent);
+    value = 0;
+    u = 0;
+    if (x <= chargeValue) {
+        u = x / chargeValue;
+        value = -pullCoeff * pullValue * u * u;
+    } else {
+        u = (x - chargeValue) / (1 - chargeValue);
+        pullAmount = pullCoeff * pullValue;
+        ringAmount = ringCoeff * amplitudeValue;
+        approachValue = 1 - exp(-approachRate * u);
+        baseValue = -pullAmount + (1 + pullAmount) * approachValue;
+        oscillation = ringAmount * exp(-dampingValue * u) * sin(frequencyValue * u);
+        endValue = -pullAmount + (1 + pullAmount) * approachEnd;
+        if (variation != 0) {
+            endValue += ringAmount * exp(-dampingValue) * sin(frequencyValue);
+        }
+        value = baseValue + oscillation + u * (1 - endValue);
+    }
+    return value;
+}
+
+azuEaseMagneticSnap(x, amount, variation) {
+    v = azuEaseSmoothstep(x);
+    levelValue = floor(v / 0.25 + 0.5) * 0.25;
+    d = v - levelValue;
+    kernelValue = cos(pi * d / 0.25);
+    value = levelValue + d * (1 - amount * 0.85 * kernelValue * kernelValue);
+    if (variation != 0) {
+        kernel = pow(kernelValue * kernelValue, 1 - 0.6 * variation);
+        value = levelValue + d * (1 - amount * 0.85 * (1 + 0.45 * variation) * kernel);
+    }
+    return value;
+}
+
+azuEaseStutterPulse(x, amplitudeValue, spacingValue, widthValue, radiusValue, pulseSign) {
+    centerValue = 0.42 - spacingValue * radiusValue;
+    w = widthValue * radiusValue;
+    d = (x - centerValue) / w;
+    d0 = -centerValue / w;
+    d1 = (1 - centerValue) / w;
+    p = amplitudeValue * radiusValue * pulseSign * exp(-d * d);
+    p0 = amplitudeValue * radiusValue * pulseSign * exp(-d0 * d0);
+    p1 = amplitudeValue * radiusValue * pulseSign * exp(-d1 * d1);
+    return p, p0, p1;
+}
+
+azuEaseStutter(x, amount, variation) {
+    amplitudeValue = 0.18 * (1 + 0.25 * variation);
+    decayValue = 0.5 * (1 + 0.25 * variation);
+    spacingValue = 0.12 * (1 + 0.35 * variation);
+    widthValue = 0.07 * (1 - 0.35 * variation);
+    // Fixed expansion avoids a Gen compiler loop-carried local scope error.
+    p, p0, p1 = azuEaseStutterPulse(x, amplitudeValue, spacingValue, widthValue, 1, 1);
+    radiusValue = decayValue;
+    term, startTerm, endTerm = azuEaseStutterPulse(x, amplitudeValue, spacingValue, widthValue, radiusValue, -1);
+    p += term;
+    p0 += startTerm;
+    p1 += endTerm;
+    radiusValue *= decayValue;
+    term, startTerm, endTerm = azuEaseStutterPulse(x, amplitudeValue, spacingValue, widthValue, radiusValue, 1);
+    p += term;
+    p0 += startTerm;
+    p1 += endTerm;
+    radiusValue *= decayValue;
+    term, startTerm, endTerm = azuEaseStutterPulse(x, amplitudeValue, spacingValue, widthValue, radiusValue, -1);
+    p += term;
+    p0 += startTerm;
+    p1 += endTerm;
+    if (variation == 0) {
+        p0 = 1.8986070203018087e-09;
+        p1 = 6.69613675683779e-45;
+    }
+    return azuEaseSmoothstep(x) + amount * azuEaseAnchor(x, p, p0, p1);
+}
+
+azuEaseRatchet(x, amount, variation) {
+    catchValue = 0.55 * (1 + 0.35 * variation);
+    setbackValue = 0.18 * (1 + 0.3 * variation);
+    scaledValue = x * 8;
+    toothIndex = min(7, max(0, floor(scaledValue)));
+    u = scaledValue - toothIndex;
+    climbValue = 0;
+    if (u < catchValue) {
+        climbValue = azuEaseSmoothstep(u / catchValue);
+    } else {
+        r = (u - catchValue) / (1 - catchValue);
+        climbValue = 1 - setbackValue * 16 * r * r * (1 - r) * (1 - r);
+    }
+    return x + amount * (climbValue - u) / 8;
+}
+
+azuEaseCollapse(x, amount, variation) {
+    releaseValue = 0.45 * (1 + 0.35 * variation);
+    tensionAmount = 0.07 * (1 + 0.5 * variation);
+    breakValue = max(0.15, min(0.85, 0.62 + 0.1 * variation));
+    value = 0;
+    if (x <= breakValue) {
+        t = x / breakValue;
+        value = amount * tensionAmount * 16 * t * t * (1 - t) * (1 - t);
+    } else {
+        u = (x - breakValue) / (1 - breakValue);
+        baselineValue = azuEaseSmoothstep(u);
+        value = baselineValue + amount *
+            (azuEaseSmoothstep(max(0, min(1, u / releaseValue))) - baselineValue);
+    }
+    return value;
+}
+
+azuEasePhiSpiral(x, amount, variation) {
+    amplitudeValue = 0.35 * (1 - 0.2 * variation);
+    decayValue = 1.3 * (1 + 0.2 * variation);
+    pivotValue = max(0.15, min(0.85, 0.6180339887498948 + 0.1 * variation));
+    frequencyValue = 13.057005210545986 * (1 + 0.3 * variation);
+    r = 0;
+    directionValue = 1;
+    if (x < pivotValue) {
+        r = (pivotValue - x) / pivotValue;
+        directionValue = -1;
+    } else {
+        r = (x - pivotValue) / (1 - pivotValue);
+    }
+    p = 0;
+    if (r > 1e-9) {
+        p = directionValue * amplitudeValue * pow(r, decayValue) * cos(frequencyValue * log(r));
+    }
+    return x + amount * azuEaseAnchor(x, p, -amplitudeValue, amplitudeValue);
+}
+
+azuEaseRoundedLinearRamp(x) {
+    t = max(0, min(1, x));
+    edgeValue = 0.08;
+    value = (t - edgeValue / 2) / (1 - edgeValue);
+    if (t < edgeValue) {
+        value = t * t / (2 * edgeValue * (1 - edgeValue));
+    } else if (t > 1 - edgeValue) {
+        value = 1 - (1 - t) * (1 - t) / (2 * edgeValue * (1 - edgeValue));
+    }
+    return value;
+}
+
+azuEaseInkDiffusion(x, amount, variation) {
+    strokeEnd = 0.25 + 0.02 * variation;
+    strokeLevel = 0.84 + 0.02 * variation;
+    onsetValue = 0.34 + 0.02 * variation;
+    firstEnd = 0.46 + 0.01 * variation;
+    secondStart = 0.55 - 0.015 * variation;
+    secondEnd = 0.74 + 0.015 * variation;
+    recoveryValue = 0.83 - 0.01 * variation;
+    firstDepth = 0.30 * (1 + 0.15 * variation);
+    secondDepth = 0.13 * (1 - 0.2 * variation);
+    creepValue = 0.025;
+    tailValue = azuEaseRoundedLinearRamp((x - recoveryValue) / (1 - recoveryValue));
+    strokeValue = strokeLevel * azuEaseRoundedLinearRamp(x / strokeEnd) + (1 - strokeLevel) * tailValue;
+    stainValue =
+        firstDepth * azuEaseRoundedLinearRamp((x - onsetValue) / (firstEnd - onsetValue)) +
+        secondDepth * azuEaseRoundedLinearRamp((x - secondStart) / (secondEnd - secondStart)) +
+        creepValue * azuEaseRoundedLinearRamp((x - onsetValue) / (recoveryValue - onsetValue)) -
+        (firstDepth + secondDepth + creepValue) * tailValue;
+    return strokeValue - amount * stainValue;
+}
+
+azuEaseFracture(x, amount, variation) {
+    t1 = 0.13 + 0.024 * variation;
+    t2 = 0.28 - 0.018 * variation;
+    t3 = 0.35 + 0.01 * variation;
+    t4 = 0.58 + 0.03 * variation;
+    t5 = 0.71 - 0.018 * variation;
+    t6 = 0.80 + 0.012 * variation;
+    t7 = 0.92 - 0.012 * variation;
+    y1 = 0.25 + 0.04 * variation;
+    y2 = 0.12 - 0.02 * variation;
+    y3 = 0.48 - 0.04 * variation;
+    y4 = 0.38 + 0.03 * variation;
+    y5 = 0.80 + 0.03 * variation;
+    y6 = 0.61 - 0.03 * variation;
+    y7 = 0.94 - 0.01 * variation;
+    reliefValue =
+        y1 * azuEaseRoundedLinearRamp(x / t1) +
+        (y2 - y1) * azuEaseRoundedLinearRamp((x - t1) / (t2 - t1)) +
+        (y3 - y2) * azuEaseRoundedLinearRamp((x - t2) / (t3 - t2)) +
+        (y4 - y3) * azuEaseRoundedLinearRamp((x - t3) / (t4 - t3)) +
+        (y5 - y4) * azuEaseRoundedLinearRamp((x - t4) / (t5 - t4)) +
+        (y6 - y5) * azuEaseRoundedLinearRamp((x - t5) / (t6 - t5)) +
+        (y7 - y6) * azuEaseRoundedLinearRamp((x - t6) / (t7 - t6)) +
+        (1 - y7) * azuEaseRoundedLinearRamp((x - t7) / (1 - t7));
+    ridgeStart = 0.43 + 0.015 * variation;
+    ridgeWidth = 0.04 * (1 - 0.2 * variation);
+    ridgeValue = 0.08 * (1 + 0.2 * variation) *
+        (azuEaseRoundedLinearRamp((x - ridgeStart) / ridgeWidth) -
+        azuEaseRoundedLinearRamp((x - ridgeStart - ridgeWidth) / (0.06 * (1 + 0.2 * variation))));
+    return x + amount * (reliefValue + ridgeValue - x);
+}
+
+azuEaseHesitate(x, amount, variation) {
+    amount = azuEaseBoundCharacter(amount);
+    depthValue = abs(variation);
+    center1 = 0.15 + 0.20 * depthValue + 0.04 * variation;
+    center2 = 0.27 + 0.24 * depthValue + 0.10 * variation;
+    left1 = 0.05 * (1 - 0.3 * variation);
+    right1 = 0.05 * (1 + 0.5 * variation);
+    left2 = 0.04 * (1 + 0.3 * variation);
+    right2 = 0.04 * (1 - 0.5 * variation);
+    amplitude1 = 0.14 * (1 - 0.3 * variation);
+    amplitude2 = 0.05 + 0.15 * depthValue + 0.08 * variation;
+    firstExponent = 0.6;
+    secondExponent = 1.8;
+    signValue = amount >= 0 ? 1 : -1;
+    coeff1 = signValue * pow(abs(amount), firstExponent);
+    coeff2 = signValue * pow(abs(amount), secondExponent);
+    p0 = -coeff1 * amplitude1 * exp(-pow(center1 / left1, 2)) -
+        coeff2 * amplitude2 * exp(-pow(center2 / left2, 2));
+    p1 = -coeff1 * amplitude1 * exp(-pow((1 - center1) / right1, 2)) -
+        coeff2 * amplitude2 * exp(-pow((1 - center2) / right2, 2));
+    width1 = x < center1 ? left1 : right1;
+    width2 = x < center2 ? left2 : right2;
+    d1 = (x - center1) / width1;
+    d2 = (x - center2) / width2;
+    p = -coeff1 * amplitude1 * exp(-d1 * d1) - coeff2 * amplitude2 * exp(-d2 * d2);
+    return azuEaseSmoothstep(x) + azuEaseAnchor(x, p, p0, p1);
+}
+
+azuEaseBowChange(x, amount, variation) {
+    amplitudeValue = 0.5 * (1 + 0.35 * variation);
+    centerValue = max(0.25, min(0.8, 0.55 + 0.12 * variation));
+    w = 0.06 * (1 + 0.4 * variation);
+    d = (x - centerValue) / w;
+    p = amplitudeValue * d * exp(-0.5 * d * d);
+    p0 = -2.5988507301734278e-18;
+    p1 = 2.2882262541020126e-12;
+    if (variation != 0) {
+        d0 = -centerValue / w;
+        d1 = (1 - centerValue) / w;
+        p0 = amplitudeValue * d0 * exp(-0.5 * d0 * d0);
+        p1 = amplitudeValue * d1 * exp(-0.5 * d1 * d1);
+    }
+    return azuEaseSmoothstep(x) + amount * azuEaseAnchor(x, p, p0, p1);
+}
+
+azuEaseRicochet(x, amount, variation) {
+    dampingValue = 2 * (1 + 0.45 * variation);
+    frequencyValue = 6 * pi * (1 + 0.15 * variation);
+    chirpValue = 10 * pi * (1 + 0.35 * variation);
+    amplitudeValue = 0.3 * (1 + 0.25 * variation);
+    p1 = 0.04060058497098381;
+    if (variation != 0) {
+        p1 = amplitudeValue * exp(-dampingValue) * azuEaseParabolicWave(frequencyValue + chirpValue);
+    }
+    phaseValue = frequencyValue * x + chirpValue * x * x;
+    p = amplitudeValue * exp(-dampingValue * x) * azuEaseParabolicWave(phaseValue);
+    return x + amount * azuEaseAnchor(x, p, amplitudeValue, p1);
+}
+
+azuEaseSpiccato(x, amount, variation) {
+    centerValue = 0.45 + 0.07 * variation;
+    widthValue = 0.05 * (1 + 0.55 * variation);
+    depthValue = 0.95 * (1 - 0.25 * variation);
+    p1 = -2.6797315840371285e-53;
+    if (variation != 0) {
+        p1 = -depthValue * exp(-pow((1 - centerValue) / widthValue, 2));
+    }
+    d = (x - centerValue) / widthValue;
+    p = -depthValue * azuEaseSmoothstep(x) * exp(-d * d);
+    return azuEaseSmoothstep(x) + amount * azuEaseAnchor(x, p, 0, p1);
+}
+
+azuEaseNative(x, curveIndex, amount, variation) {
+    value = x;
+    if (curveIndex == 0) {
+        contourValue = 2.4 * variation * x * x * (1 - x) * (1 - x);
+        value = x + amount * (azuEaseSmoothstep(x) + contourValue - x);
+    } else if (curveIndex == 1) {
+        value = azuEaseGompertz(x, amount, variation);
+    } else if (curveIndex == 2) {
+        value = azuEaseViscous(x, amount, variation);
+    } else if (curveIndex == 3) {
+        value = azuEaseSpringSoft(x, amount, variation);
+    } else if (curveIndex == 4) {
+        value = azuEaseSpringTight(x, amount, variation);
+    } else if (curveIndex == 5) {
+        value = azuEaseBounceGravity(x, amount, variation);
+    } else if (curveIndex == 6) {
+        value = azuEaseRecoil(x, amount, variation);
+    } else if (curveIndex == 7) {
+        value = azuEaseMagneticSnap(x, amount, variation);
+    } else if (curveIndex == 8) {
+        value = azuEaseStutter(x, amount, variation);
+    } else if (curveIndex == 9) {
+        value = azuEaseRatchet(x, amount, variation);
+    } else if (curveIndex == 10) {
+        value = azuEaseCollapse(x, amount, variation);
+    } else if (curveIndex == 11) {
+        value = azuEasePhiSpiral(x, amount, variation);
+    } else if (curveIndex == 12) {
+        value = azuEaseInkDiffusion(x, amount, variation);
+    } else if (curveIndex == 13) {
+        value = azuEaseHesitate(x, amount, variation);
+    } else if (curveIndex == 14) {
+        value = azuEaseBowChange(x, amount, variation);
+    } else if (curveIndex == 15) {
+        value = azuEaseRicochet(x, amount, variation);
+    } else if (curveIndex == 16) {
+        value = azuEaseSpiccato(x, amount, variation);
+    } else if (curveIndex == 17) {
+        value = azuEaseFracture(x, amount, variation);
+    } else if (curveIndex == 18) {
+        value = azuEaseBounceViscoelastic(x, amount, variation);
+    }
+    // Also anchor the internal endpoint where the two inout halves meet.
+    return x <= 0 ? 0 : (x >= 1 ? 1 : value);
+}
+
+azuEaseMode(progressValue, curveValue, modeValue, amount, jitterValue) {
+    x = max(0, min(1, progressValue));
+    curveIndex = floor(max(0, min(18, curveValue)) + 0.5);
+    modeIndex = floor(max(0, min(2, modeValue)) + 0.5);
+    variation = max(-1, min(1, jitterValue));
+    evalX = x;
+    outputScale = 1;
+    mirroredValue = 0;
+    if (modeIndex == 1) {
+        evalX = 1 - x;
+        mirroredValue = 1;
+    } else if (modeIndex == 2) {
+        evalX = x < 0.5 ? 2 * x : 2 * (1 - x);
+        outputScale = 0.5;
+        mirroredValue = x >= 0.5;
+    }
+    nativeValue = azuEaseNative(evalX, curveIndex, amount, variation);
+    value = mirroredValue ? 1 - outputScale * nativeValue : outputScale * nativeValue;
+    return x <= 0 ? 0 : (x >= 1 ? 1 : value);
+}
+
+azuEaseLimit(value, marginValue) {
+    if (marginValue <= 0) {
+        value = max(0, min(1, value));
+    } else if (value > 1) {
+        value = 1 + marginValue * tanh((value - 1) / marginValue);
+    } else if (value < 0) {
+        value = -marginValue * tanh(-value / marginValue);
+    }
+    return value;
+}
+
+azuEaseShape(progressValue, curveValue, modeValue, amount, marginValue, jitterValue) {
+    return azuEaseLimit(azuEaseMode(progressValue, curveValue, modeValue, amount, jitterValue), marginValue);
+}
+
+// Exact unsigned arithmetic in doubles avoids platform-dependent integer casts.
+azuEaseUint32(value) {
+    // Keep literals within signed 32-bit range and intermediate values floating.
+    return (value * 0.25 - floor(value * 2.3283064365386963e-10) * 1073741824) * 4;
+}
+
+azuEaseMultiply32(a, b) {
+    lowA = a - floor(a / 65536) * 65536;
+    lowB = b - floor(b / 65536) * 65536;
+    crossValue = azuEaseUint32(floor(a / 65536) * lowB + lowA * floor(b / 65536));
+    return azuEaseUint32(lowA * lowB + (crossValue - floor(crossValue / 65536) * 65536) * 65536);
+}
+
+azuEaseXor32(a, b) {
+    resultValue = 0;
+    for (bitIndex = 0; bitIndex < 32; bitIndex += 1) {
+        placeValue = pow(2, bitIndex);
+        halfA = floor(a / 2);
+        halfB = floor(b / 2);
+        bitA = a - 2 * halfA;
+        bitB = b - 2 * halfB;
+        resultValue += (bitA != bitB) * placeValue;
+        a = halfA;
+        b = halfB;
+    }
+    return resultValue;
+}
+
+azuEaseHash(value) {
+    h = azuEaseXor32(value, floor(value / 65536));
+    h = azuEaseMultiply32(h, 2146121005);
+    h = azuEaseXor32(h, floor(h / 32768));
+    h = azuEaseMultiply32(h, -2073254261);
+    h = azuEaseXor32(h, floor(h / 65536));
+    return h * 2.3283064365386963e-10;
+}
+
+azuEaseRestart(previousValue, currentValue) {
+    validValue = previousValue >= 0 && previousValue <= 1 &&
+        currentValue >= 0 && currentValue <= 1;
+    return validValue && ((currentValue < 0.05 && previousValue - currentValue > 0.5) ||
+        (currentValue > 0.95 && currentValue - previousValue > 0.5));
+}
+
+azuEaseVaryInput(progressValue, amount, driftValue, intensityHash, warpHash, structuralHash) {
+    // intensityHash is retained for call compatibility; drift never scales amount.
+    depthValue = max(0, min(1, driftValue));
+    x = max(0, min(1, progressValue));
+    effectiveAmount = amount;
+    effectiveX = x;
+    structuralValue = 0;
+    if (depthValue != 0) {
+        effectiveX = max(0, min(1, x + depthValue * 0.12 * (2 * warpHash - 1) * sin(pi * x)));
+        structuralValue = depthValue * (2 * structuralHash - 1);
+    }
+    return effectiveX, effectiveAmount, structuralValue;
+}
+
+azuEaseDriftRaw(progressValue, curveValue, modeValue, amount,
+    driftValue, intensityHash, warpHash, structuralHash) {
+    effectiveX, effectiveAmount, structuralValue = azuEaseVaryInput(
+        progressValue, amount, driftValue, intensityHash, warpHash, structuralHash);
+    x = max(0, min(1, progressValue));
+    value = azuEaseMode(effectiveX, curveValue, modeValue, effectiveAmount, structuralValue);
+    return x <= 0 ? 0 : (x >= 1 ? 1 : value);
+}
+
+azuEaseDriftShape(progressValue, curveValue, modeValue, amount, marginValue,
+    driftValue, intensityHash, warpHash, structuralHash) {
+    return azuEaseLimit(azuEaseDriftRaw(progressValue, curveValue, modeValue, amount,
+        driftValue, intensityHash, warpHash, structuralHash), marginValue);
+}
+
+azuEaseBlendTerm(weightValue, progressValue, curveValue, modeValue, amount,
+    driftValue, intensityHash, warpHash, structuralHash) {
+    value = 0;
+    if (weightValue != 0) {
+        value = weightValue * azuEaseDriftRaw(progressValue, curveValue, modeValue, amount,
+            driftValue, intensityHash, warpHash, structuralHash);
+    }
+    return value;
+}
+
+azuEaseEvaluate(progressValue, curveValue, modeValue, amount, marginValue, driftValue, generationValue, streamValue) {
+    seedValue = azuEaseXor32(generationValue, azuEaseMultiply32(streamValue, -1640531527));
+    return azuEaseDriftShape(progressValue, curveValue, modeValue, amount, marginValue, driftValue,
+        azuEaseHash(seedValue), azuEaseHash(azuEaseXor32(seedValue, -1640531527)),
+        azuEaseHash(azuEaseXor32(seedValue, -2048144777)));
+}
