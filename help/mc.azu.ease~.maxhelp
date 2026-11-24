@@ -78,7 +78,7 @@
 						740.0,
 						22.0
 					],
-					"text": "1. Enable DSP. This help makes no sound."
+					"text": ""
 				}
 			},
 			{
@@ -183,7 +183,7 @@
 						420.0,
 						22.0
 					],
-					"text": "2. Choose a curve, then try drift 0 and 0.6."
+					"text": "Compare drift 0 and 0.6."
 				}
 			},
 			{
@@ -389,7 +389,7 @@
 						860.0,
 						38.0
 					],
-					"text": "Character / Overshoot: curve intensity (1 = native). Headroom 0 keeps outputs within 0..1.\nChannel count follows the input. mc.dup~ duplicates mono; @chans alone does not duplicate it."
+					"text": "Character / Overshoot: 1 = native. Headroom 0 keeps outputs within 0..1.\nChannel count follows the input unless @chans fixes it."
 				}
 			},
 			{

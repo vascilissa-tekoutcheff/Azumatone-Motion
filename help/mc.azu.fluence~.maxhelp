@@ -70,7 +70,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 90.0, 116.0, 330.0, 22.0 ],
-					"text" : "1. Enable DSP. This help makes no sound."
+					"text" : ""
 				}
 
 			}
@@ -81,7 +81,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 30.0, 170.0, 390.0, 22.0 ],
-					"text" : "2. Choose a target for the four voices."
+					"text" : "Choose a target for the four voices."
 				}
 
 			}
@@ -152,7 +152,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 470.0, 170.0, 375.0, 22.0 ],
-					"text" : "3. Shape the motion, then try another target."
+					"text" : "Shape the motion, then change target."
 				}
 
 			}
@@ -176,7 +176,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 655.0, 209.0, 150.0, 22.0 ],
-					"text" : "Spread (0..1)"
+					"text" : "dispersion"
 				}
 
 			}
@@ -200,7 +200,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 655.0, 249.0, 150.0, 22.0 ],
-					"text" : "Togetherness (0..1)"
+					"text" : "cohesion"
 				}
 
 			}
@@ -224,7 +224,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 655.0, 289.0, 150.0, 22.0 ],
-					"text" : "Time scale (ms)"
+					"text" : "inertia (ms)"
 				}
 
 			}
@@ -248,7 +248,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 655.0, 329.0, 150.0, 22.0 ],
-					"text" : "Settling (0..1)"
+					"text" : "damping"
 				}
 
 			}
@@ -364,7 +364,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 30.0, 625.0, 820.0, 38.0 ],
-					"text" : "This example stays within 0..1. Without @mode bounded, Fluence runs free and may overshoot.\nThe argument 4 creates four channels. mc.unpack~ separates them here only for display."
+					"text" : "With @mode bounded this example stays within @range 0 1. In free mode, the voices may overshoot."
 				}
 
 			}

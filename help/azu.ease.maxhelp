@@ -305,7 +305,7 @@
 						396.0,
 						22.0
 					],
-					"text": "Shape numbers or lists with an easing curve. No DSP needed."
+					"text": "Shape numbers or lists with an easing curve."
 				}
 			},
 			{
@@ -327,7 +327,7 @@
 						255.0,
 						22.0
 					],
-					"text": "1. Move the slider (0 to 1), or click a list."
+					"text": "Progress 0..1, or a list of progress values."
 				}
 			},
 			{
@@ -489,7 +489,7 @@
 						310.0,
 						22.0
 					],
-					"text": "2. Choose a curve, then send input or bang."
+					"text": "Choose a curve, then send input or bang."
 				}
 			},
 			{
@@ -681,7 +681,7 @@
 						366.0,
 						22.0
 					],
-					"text": "With drift above 0: click nextdrift, then send input or bang."
+					"text": "With drift above 0, use nextdrift before recalculating."
 				}
 			},
 			{
@@ -730,7 +730,7 @@
 						678.0,
 						53.0
 					],
-					"text": "Settings apply to the next input or bang; no automatic output.\nNextdrift selects another deterministic variation; resetdrift returns to the initial variation. Neither outputs a value.\nMode: in / out / inout."
+					"text": "Settings apply to the next input or bang.\nnextdrift selects another deterministic variation; resetdrift restores generation zero. Neither produces output.\nMode: in / out / inout."
 				}
 			},
 			{
@@ -858,7 +858,7 @@
 						106.0,
 						22.0
 					],
-					"text": "Auto-run: 0 -> 1"
+					"text": "Progress: 0 -> 1"
 				}
 			},
 			{
@@ -880,7 +880,7 @@
 						350.0,
 						22.0
 					],
-					"text": "Automatic progression uses Max messages, not DSP."
+					"text": ""
 				}
 			},
 			{

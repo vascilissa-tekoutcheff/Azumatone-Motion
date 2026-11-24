@@ -53,7 +53,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 95.0, 122.0, 273.0, 22.0 ],
-					"text" : "1. Enable DSP. This help makes no sound."
+					"text" : ""
 				}
 
 			}
@@ -64,7 +64,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 30.0, 180.0, 331.0, 22.0 ],
-					"text" : "2. Click a target, then watch the four voices follow it."
+					"text" : "Click a target; the four voices follow it."
 				}
 
 			}
@@ -123,7 +123,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 460.0, 220.0, 302.0, 22.0 ],
-					"text" : "3. Change the motion, then click a target again."
+					"text" : "Shape the motion, then change target."
 				}
 
 			}
@@ -147,7 +147,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 640.0, 261.0, 90.0, 22.0 ],
-					"text" : "Spread (0..1)"
+					"text" : "dispersion"
 				}
 
 			}
@@ -171,7 +171,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 640.0, 303.0, 129.0, 22.0 ],
-					"text" : "Togetherness (0..1)"
+					"text" : "cohesion"
 				}
 
 			}
@@ -195,7 +195,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 640.0, 345.0, 108.0, 22.0 ],
-					"text" : "Time scale (ms)"
+					"text" : "inertia (ms)"
 				}
 
 			}
@@ -219,7 +219,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 640.0, 387.0, 92.0, 22.0 ],
-					"text" : "Settling (0..1)"
+					"text" : "damping"
 				}
 
 			}
@@ -287,7 +287,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 30.0, 610.0, 860.0, 38.0 ],
-					"text" : "This example stays within 0..1. Without @mode bounded, Fluence runs free and may overshoot.\nThe argument 4 creates four outlets. For one multichannel cable instead, use mc.azu.fluence~."
+					"text" : "With @mode bounded this example stays within @range 0 1. In free mode, the voices may overshoot."
 				}
 
 			}

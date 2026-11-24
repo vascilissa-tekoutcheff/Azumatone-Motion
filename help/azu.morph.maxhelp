@@ -32,7 +32,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 30.0, 66.0, 830.0, 22.0 ],
-					"text" : "Move between two lists of values with one easing curve. No DSP needed."
+					"text" : "Interpolate between numeric lists with one Ease curve."
 				}
 
 			}
@@ -43,7 +43,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 30.0, 112.0, 800.0, 22.0 ],
-					"text" : "1. Click to start again: A = [220, 0.1, -1], B = [880, 0.8, 1]."
+					"text" : "A = [220, 0.1, -1], B = [880, 0.8, 1]."
 				}
 
 			}
@@ -78,7 +78,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 30.0, 196.0, 410.0, 22.0 ],
-					"text" : "2. Move from A (0) to B (1)."
+					"text" : "Progress 0 -> 1"
 				}
 
 			}
@@ -143,7 +143,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 30.0, 428.0, 420.0, 22.0 ],
-					"text" : "4. Read the output list: frequency, amplitude, pan."
+					"text" : "Output: frequency, amplitude, pan."
 				}
 
 			}
@@ -154,7 +154,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 480.0, 196.0, 380.0, 22.0 ],
-					"text" : "3. Choose a curve, then move again."
+					"text" : ""
 				}
 
 			}
@@ -215,7 +215,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 30.0, 556.0, 570.0, 22.0 ],
-					"text" : "Want automatic timing instead of a slider? Use @duration <ms>:"
+					"text" : "Timed mode: @duration <ms>"
 				}
 
 			}

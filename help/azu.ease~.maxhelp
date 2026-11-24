@@ -96,7 +96,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 24.0, 635.0, 860.0, 38.0 ],
-					"text" : "Drift adds deterministic variation at each ramp restart; at drift = 0, the curve repeats identically.\nnextdrift: next variation; resetdrift: first variation. Each delay is 2 s, matching the 0.5 Hz phasor."
+					"text" : "Drift adds deterministic variation at each ramp restart.\nnextdrift selects the next variation; resetdrift restores generation zero."
 				}
 
 			}
@@ -179,7 +179,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 84.0, 103.0, 530.0, 22.0 ],
-					"text" : "Enable DSP to view the signal. This help patch makes no sound."
+					"text" : ""
 				}
 
 			}
@@ -190,7 +190,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 24.0, 151.0, 223.0, 22.0 ],
-					"text" : "1. A 0..1 ramp at 0.5 Hz"
+					"text" : "0..1 progress ramp"
 				}
 
 			}
@@ -225,7 +225,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 43.0, 340.0, 324.0, 22.0 ],
-					"text" : "3. Compare the output with its two previous cycles:"
+					"text" : ""
 				}
 
 			}
@@ -251,7 +251,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 264.0, 151.0, 340.0, 22.0 ],
-					"text" : "2. Choose a curve and adjust its behavior:"
+					"text" : ""
 				}
 
 			}
@@ -339,7 +339,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 24.0, 677.0, 645.0, 22.0 ],
-					"text" : "Character changes ramp over 5 ms; function changes crossfade over 10 ms. Output is a control signal."
+					"text" : "Character changes ramp over 5 ms; function changes crossfade over 10 ms."
 				}
 
 			}
@@ -385,7 +385,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 468.0, 372.0, 205.0, 22.0 ],
-					"text" : "96,000 samples = 2 s at 48 kHz"
+					"text" : ""
 				}
 
 			}
