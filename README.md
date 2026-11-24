@@ -31,25 +31,6 @@ speakers.
 The `mc.` objects are native multichannel externals. Use `mc.dup~` to send
 the same mono signal to several channels.
 
-`azu.fluence~` and `mc.azu.fluence~` drive several coupled elastic voices from
-one mono target signal. The first argument sets the number of voices
-(default 4). Attributes:
-
-| Attribute | Default | Effect |
-|---|---|---|
-| `inertia` | `150` | Response time of the voices, in ms |
-| `damping` | `0.35` | Damping of the voices' response |
-| `cohesion` | `0.35` | Draws the voices together |
-| `dispersion` | `0.5` | Spreads the voices apart during transitions |
-| `mode` | `free` | `bounded` keeps the voices inside `range`; `free` may overshoot. Set at creation only |
-| `range` | `0 1` | Bounds used by `mode bounded`; changes are smoothed over 10 ms |
-
-Each voice has its own pseudo-random response profile. Profiles are reassigned
-when the input reverses direction or starts moving after at least 10 ms at a
-constant value, so with several voices the one favored by the gesture's
-direction changes from one gesture to the next. Positions and velocities are
-preserved, so existing momentum may still make another voice visibly lead.
-
 For message objects, the 19 Ease functions and Gen~ usage, see
 [message-objects.md](docs/message-objects.md). The package also includes the
 `azu.ease.gendsp` Gen~ patch with its supporting `AzumatoneEaseFunctions.genexpr`,
