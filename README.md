@@ -9,8 +9,8 @@ Place the `Azumatone Motion` folder in your Max Packages folder, then restart
 Max. On macOS with Max 9, the folder is normally
 `~/Documents/Max 9/Packages/`.
 
-The included `.mxo` externals are for macOS. This package is still under
-development; check the available binaries for your platform.
+The included `.mxo` externals are universal macOS builds for Intel and Apple
+Silicon.
 
 ## Objects
 
@@ -43,14 +43,6 @@ For message objects, Ease functions and Gen~ usage, see
 [message-objects.md](docs/message-objects.md). The package also includes the
 `azu.ease.gendsp` Gen~ patch and its supporting `AzumatoneEaseFunctions.genexpr`.
 
-## Older patches
-
-Replace former `enc.*` and `mc.enc.*` object names with `azu.*` and `mc.azu.*`;
-legacy aliases are not provided. For Gen~, use `gen~ azu.ease` or
-`mc.gen~ azu.ease`. Custom codeboxes should require
-`AzumatoneEaseFunctions.genexpr` and use `azuEase*` helper names.
-Remove the old package from Max's search path and restart Max after upgrading.
-
 ## License
 
 Azumatone Motion is distributed under the MIT License. See [LICENSE](LICENSE).
@@ -58,5 +50,4 @@ Azumatone Motion is distributed under the MIT License. See [LICENSE](LICENSE).
 It may be used in personal, educational and commercial Max projects. Modified
 or redistributed copies must retain the copyright notice and license text.
 
-The Cycling '74 Max SDK used to build the externals retains its own license,
-included with the source distribution in `source/max-sdk-base/LICENSE.md`.
+The Cycling '74 Max SDK used to build the externals retains its own license.
