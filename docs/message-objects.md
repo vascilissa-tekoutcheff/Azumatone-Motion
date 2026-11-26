@@ -137,27 +137,36 @@ overflow produce no output. The last successful calculation remains available.
 The function menu follows the browsing order below. Numeric IDs are listed in
 the [Gen~](#gen) table.
 
-| Function | Character 1 | Character 0 |
+The 19 functions are grouped into four families:
+
+- **Curves**: `smoothstep`, `gompertz`, `viscous`
+- **Dynamics**: `spring_soft`, `spring_tight`, `bounce_gravity`,
+  `bounce_viscoelastic`, `recoil`, `magnetic_snap`
+- **Gestural behaviors**: `stutter`, `ratchet`, `collapse`, `phi_spiral`,
+  `ink_diffusion`, `hesitate`, `fracture`
+- **Articulations**: `bow_change`, `ricochet`, `spiccato`
+
+| Family | Function | Character 1 |
 |---|---|---|
-| `smoothstep` | Cubic S-curve | Straight line |
-| `gompertz` | Asymmetric sigmoid: slow start, fast middle, long tail | Straight line |
-| `viscous` | Stiction, then an exponential catch-up | Straight line |
-| `ink_diffusion` | Near-linear mark followed by two spreading stages | Clean mark without stain |
-| `phi_spiral` | Log-periodic oscillation around the golden-ratio point | Straight line |
-| `magnetic_snap` | Smooth attraction toward five levels | `smoothstep` |
-| `hesitate` | Two backward dips before commitment | `smoothstep` |
-| `recoil` | Pull-back, snap and damped ring | Monotonic approach |
-| `spring_soft` | Slow, heavily damped spring | Straight line |
-| `spring_tight` | Taut, lightly damped spring | Straight line |
-| `bounce_gravity` | Ballistic fall and inelastic rebounds | Fall without rebound |
-| `bounce_viscoelastic` | Indentation, creep, release and decaying flights | Firm contact |
-| `ricochet` | Decaying oscillation whose repetitions accelerate | Straight line |
-| `bow_change` | Dip and catch around a bow change | `smoothstep` |
-| `spiccato` | `smoothstep` with a deep notch near 0.45 | `smoothstep` |
-| `stutter` | Four shrinking, alternating pulses | `smoothstep` |
-| `ratchet` | Eight climbs with broad mechanical setbacks | Straight line |
-| `fracture` | Unequal facets and a smaller nested ridge | Straight line |
-| `collapse` | Pre-tension followed by a compressed release and hold | Delayed gentle release |
+| Curves | `smoothstep` | Cubic S-curve |
+| Curves | `gompertz` | Asymmetric sigmoid: slow start, fast middle, long tail |
+| Curves | `viscous` | Stiction, then an exponential catch-up |
+| Dynamics | `spring_soft` | Slow, heavily damped spring |
+| Dynamics | `spring_tight` | Taut, lightly damped spring |
+| Dynamics | `bounce_gravity` | Ballistic fall and inelastic rebounds |
+| Dynamics | `bounce_viscoelastic` | Indentation, recovery and decaying flights |
+| Dynamics | `recoil` | Pull-back, snap and damped ring |
+| Dynamics | `magnetic_snap` | Smooth attraction toward five levels |
+| Gestural behaviors | `stutter` | Four shrinking alternating pulses |
+| Gestural behaviors | `ratchet` | Eight climbs with broad mechanical setbacks |
+| Gestural behaviors | `collapse` | Pre-tension, compressed release and hold |
+| Gestural behaviors | `phi_spiral` | Log-periodic oscillation around the golden-ratio point |
+| Gestural behaviors | `ink_diffusion` | Near-linear mark, then two spreading stages |
+| Gestural behaviors | `hesitate` | Two backward dips before commitment |
+| Gestural behaviors | `fracture` | Unequal facets and a smaller nested ridge |
+| Articulations | `bow_change` | Dip and catch around a bow change |
+| Articulations | `ricochet` | Decaying oscillation with accelerating repetitions |
+| Articulations | `spiccato` | `smoothstep` with a deep notch near 0.45 |
 
 ### Character and mode
 
@@ -180,37 +189,6 @@ Descriptions in this file refer to mode `in`.
 
 Fast or abruptly changed curves can alias in audio use; Character does not make
 the package an anti-aliasing filter.
-
-### `bounce_gravity`
-
-A fall under constant acceleration meets the fixed target at 1, then loses
-energy through inelastic impacts. The result remains within 0..1 and settles at
-the target. Character controls restitution rather than amplitude: higher
-positive values produce earlier first contact, higher rebounds and more impacts.
-
-### `bounce_viscoelastic`
-
-A fall is followed by rapid indentation, slow creep, delayed recovery and five
-decaying flights between six contacts. The final contact absorbs the motion
-while resolution continues toward 1. Contact is internal to the range, at 0.68;
-compression and the complete gesture remain bounded. Higher Character produces
-deeper, longer compression and more visible rebounds.
-
-`headroom 0` does not remove this function's material compression, because the
-gesture itself is bounded.
-
-### `ink_diffusion`
-
-A near-linear mark briefly settles, spreads in two unequal stages, then resolves
-to 1. The shoulders keep moving rather than holding at staircase levels.
-Character changes only the spreading stage: the early mark remains unchanged.
-
-### `fracture`
-
-A fixed faceted relief combines unequal, mostly straight segments with a smaller
-nested ridge. Character 0 is an exact line; Character 1 reaches the complete
-relief; higher values exaggerate it and negative values invert its departure
-from the line.
 
 ## Drift
 
